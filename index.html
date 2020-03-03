@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="jquery-1.11.0.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+        }
+
+        #dv {
+            width: 400px;
+            height: 300px;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            overflow: hidden;
+        }
+
+        ul {
+            width: 2000px;
+            list-style: none;
+            position: absolute;
+            left: 0;
+            top: 0;
+            cursor: pointer;
+            font-size: 0;
+        }
+
+        li {
+            display: inline-block;
+        }
+
+        img {
+            width: 400px;
+            height: 300px;
+        }
+
+        .left {
+            top: 50%;
+            left: 0;
+            transform: translateY(-50%);
+            position: absolute;
+            background-color: rgba(0, 0, 0, 0.5);
+            font-size: 24px;
+        }
+
+        .right {
+            top: 50%;
+            right: 0;
+            transform: translateY(-50%);
+            position: absolute;
+            background-color: rgba(0, 0, 0, 0.5);
+            font-size: 24px;
+        }
+
+        .select {
+            box-sizing: border-box;
+            width: 100px;
+            height: 20px;
+            background: rgba(255, 255, 255, .3);
+            position: absolute;
+            left: 50%;
+            bottom: 20px;
+            transform: translateX(-50%);
+            border-radius: 10px;
+            padding: 5px 10px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .select > span {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            display: inline-block;
+            background-color: rgba(255,255,255,0.5);
+        }
+
+        .color {
+            background-color: #f00 !important;
+        }
+    </style>
+</head>
+<body>
+<div id="dv">
+    <ul id="uu">
+        <li>
+            <img src="image/77688096_p0.png">
+        </li>
+        <li>
+            <img src="image/77329543_p0.png">
+        </li>
+        <li>
+            <img src="image/68698242_p0.jpg">
+        </li>
+        <li>
+            <img src="image/68231639_p0.png">
+        </li>
+        <li>
+            <img src="image/77688096_p0.png">
+        </li>
+    </ul>
+    <span class="left"><</span>
+    <span class="right">></span>
+    <div class="select">
+        <span class="color"></span>
+        <span></span>
+        <span></span>
+        <span></span>
+    </div>
+</div>
+</body>
+<script>
+    let current = 0;
+    let width = $('#dv').width();
+    let time;
+    let spanList = $('.select>span');
+
+    function run() {
+        current++;
+        $('#uu').animate({left: -current * width}, 300, 'linear',function(){
+            if (current >=4) {
+                //current>=4表示现在显示的是第五张图,或者没了,要让第五张图变成第一张
+                current = 0;
+                $('#uu').css({left: 0});
+                //设为0，可以直接到第一张
+            }
+        });
+        $(spanList).removeClass('color');
+        $(spanList[current===4?0:current]).addClass('color');
+        console.log(current);
+    }
+
+    function last() {
+        if (current <= 0) {
+            //current<=0表示现在显示的是第一张图,或者没了要让第一张图变成第五张
+            current = 4;
+            $('#uu').css({left: -width * current});
+            //设为0，可以直接到第一张
+        }
+        current--;
+        $('#uu').animate({left: -current * width}, 300, 'linear',function(){
+
+        });
+        $(spanList).removeClass('color');
+        $(spanList[current===4?0:current]).addClass('color');
+    }
+
+    window.onload = function () {
+        time = setInterval(() => {
+            run();
+        }, 3000);
+    };
+
+    $('.left').on('click', function () {
+        clearInterval(time);
+        //鼠标按下的时候清除定时器，防止产生干扰
+        if (parseInt($('#uu').css('left')) === -current * width) {
+            //只有动画完成，此时点击才会触发事件，防止多次点击触发多次事件
+            run();
+        }
+        time = setInterval(() => {
+            run();
+        }, 3000);
+    });
+
+    $('.right').on('mousedown', function () {
+        clearInterval(time);
+        if (parseInt($('#uu').css('left')) === -current * width) {
+            last();
+        }
+        time = setInterval(() => {
+            run();
+        }, 3000);
+    });
+
+    $('#uu').on('mouseenter', function () {
+        clearInterval(time);
+    });
+
+    $('#uu').on('mouseleave', function () {
+        time = setInterval(() => {
+            run();
+        }, 3000);
+    });
+
+
+    for (let i = 0; i < spanList.length; i++) {
+        $(spanList[i]).attr('data-index', i);
+        $(spanList[i]).on('click', function () {
+            //确保点击的时候不会正好发生动画效果
+            clearInterval(time);
+            //点击好了之后正常
+            time = setInterval(() => {
+                run();
+            }, 3000);
+            let index = $(spanList[i]).attr('data-index');
+            $('#uu').animate({left:-index*width},300);
+            //到达对应图片后，current重新赋值，也从这里开始计算
+            current=index;
+                $(spanList).removeClass('color');
+                $(spanList[i]).addClass('color');
+        })
+    }
+</script>
+</html>
