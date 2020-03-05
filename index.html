@@ -120,6 +120,12 @@
     let time;
     let spanList = $('.select>span');
 
+
+        time = setInterval(() => {
+            run();
+        }, 3000);
+
+
     function run() {
         current++;
         $('#uu').animate({left: -current * width}, 300, 'linear',function(){
@@ -148,12 +154,6 @@
         $(spanList).removeClass('color');
         $(spanList[current===4?0:current]).addClass('color');
     }
-
-    window.onload = function () {
-        time = setInterval(() => {
-            run();
-        }, 3000);
-    };
 
     $('.left').on('click', function () {
         if (parseInt($('#uu').css('left')) === -current * width) {
